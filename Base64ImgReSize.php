@@ -25,6 +25,10 @@ class Base64ImgReSize{
 	private $Filename;
 	private $Path;
 	public function Load($file,$width,$height,$filename = false, $path = false) {
+		if(is_file($file)){
+			$imgData = base64_encode(file_get_contents($file));
+			$file = 'data:'.mime_content_type($file).';base64,'.$imgData;
+		}
 		$this->Img = urldecode($file);
 		if(strripos($this->Img,"image/png") != false){
 			$type = 'png';
