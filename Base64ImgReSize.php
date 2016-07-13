@@ -3,12 +3,12 @@
 $ImgFn = new Base64ImgReSize;
 //this file type is jpg or png
 
-$ImgFn->Load($Img,400,300,'test','images');
+$ImgFn->Load('test.jpg',400,300,'put','upload');
 //$Img is Base64 Image or File
 //set resize width 400
 //set resize height 300
 //Filename 'test', if filename is '', auto set md5(date('YmdHis').rand(100,1000))
-//upload path 'images'
+//upload path 'images'(777)
 //ps don't set 'test.jpg' or 'test.png', this class auto chack type, and set jpg or png
 
 $ImgFn->ReSize();
@@ -28,22 +28,22 @@ class Base64ImgReSize{
 	private $Config;
 	private $Filename;
 	private $Path;
-	public function Load($file,$width,$height,$filename = false, $path = false) {
+	private $Type;
+	public function Load($file, $width, $height, $path = false, $filename = false) {
 		if(is_file($file)){
 			$imgData = base64_encode(file_get_contents($file));
 			$file = 'data:'.mime_content_type($file).';base64,'.$imgData;
-		}
+		}echo $imgData;exit;
 		$this->Img = urldecode($file);
 		if(strripos($this->Img,"image/png") != false){
-			$type = 'png';
+			$this->Type = 'png';
 			$this->Img = str_replace('data:image/png;base64,','', $this->Img);
-			$this->Img = str_replace(' ', '+', $this->Img);
 		}
 		if(strripos($this->Img,"image/jpeg") != false){
-			$type = 'jpeg';
+			$this->Type = 'jpeg';
 			$this->Img = str_replace('data:image/jpeg;base64,','', $this->Img);
-			$this->Img = str_replace(' ', '+', $this->Img);
 		}
+		$this->Img = str_replace(' ', '+', $this->Img);
 		$Tmp = base64_decode($this->Img);
 		$this->Img = imagecreatefromstring($Tmp);
 		$this->ImgInfo = getimagesizefromstring($Tmp);
@@ -87,22 +87,17 @@ class Base64ImgReSize{
 			}
 		}
 		$new_image = imagecreatetruecolor($width, $height);
-		//利用imagecopyresampled resize圖片
-		//imagecopyresampled(目地圖片,來源圖片,目地x座標,目地y座標,來源x座標,來源y座標,目地寬度,目地高度,來源寬度,來源高度)
 		imagecopyresampled($new_image, $this->Img, 0, 0, 0, 0, $width, $height, $this->ImgInfo[0], $this->ImgInfo[1]);
-		//將image變數指向新的圖片
 		$this->Img = $new_image;
 	}
 	public function Save() {
-		if($this->Filename == ''){
-			$this->Filename = $this->Path.md5(date('YmdHis').rand(100,1000));
-		}else{
-			$this->Filename = $this->Path.$this->Filename;
-		}
-		if( $this->ImgInfo['mime'] == 'image/jpeg' ) {
+		$this->Filename = ($this->Filename == '')?md5(date('YmdHis').rand(100,1000)):$this->Filename;
+		$this->Filename = $this->Path.$this->Filename;
+		if($this->Type == 'jpeg'){
 			$this->Filename = $this->Filename.'.jpg';
 			imagejpeg($this->Img,$this->Filename,75);
-		}elseif( $this->ImgInfo['mime'] == 'image/png' ) {
+		}
+		if($this->Type == 'png'){
 			$this->Filename = $this->Filename.'.png';
 			imagepng($this->Img,$this->Filename);
 		}
@@ -111,19 +106,17 @@ class Base64ImgReSize{
 		return $this->Filename;
 	}
 	public function GetImg(){
-		$tmp = '';
+		$ret = "data:image/".$this->Type.";base64,";
 		ob_start ();
-		if( $this->ImgInfo['mime'] == 'image/jpeg' ) {
-			$tmp = 'data:image/jpeg;base64,';
+		if($this->Type == 'jpeg') {
 			imagejpeg ($this->Img);
 		}
-		if( $this->ImgInfo['mime'] == 'image/png' ) {
-			$tmp = 'data:image/png;base64,';
+		if($this->Type == 'png') {
 			imagepng ($this->Img);
 		}
-		$this->Img = ob_get_contents ();
+		$this->Img = ob_get_contents();
 		ob_end_clean ();
-		$ret = $tmp.base64_encode ($this->Img);
+		$ret .= base64_encode($this->Img);
 		return $ret;
 	}
 }
