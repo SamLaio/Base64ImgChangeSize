@@ -120,7 +120,7 @@ class Base64ImgReSize{
 				$this->Filename = $this->Filename.'.png';
 				imagepng($this->Img,$this->Filename);
 			}
-			//修改權限
+			/*修改權限*/
 			chmod($this->Filename,0755);
 			return $this->Filename;
 		}else{
