@@ -3,7 +3,7 @@
 $ImgFn = new Base64ImgReSize;
 
 $ImgFn->Load($Img,400,300,'test','images');
-//$Img is Base64
+//$Img is Base64 Image or File
 //set resize width 400
 //set resize height 300
 //Filename 'test', if filename is '', auto set md5(date('YmdHis').rand(100,1000))
