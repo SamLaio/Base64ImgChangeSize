@@ -15,7 +15,10 @@ $ImgFn->ReSize();
 
 $ImgFn->Save();
 //save imgage to path
+//return file path(EX:path/filename)
+
 echo $ImgFn->GetImg();
+
 */
 
 class Base64ImgReSize{
@@ -45,7 +48,19 @@ class Base64ImgReSize{
 		$this->ImgInfo = getimagesizefromstring($Tmp);
 		$this->Config = array('width'=>$width,'height'=>$height);
 		$this->Filename = ($filename)?$filename:'';
-		$this->Path = ($path)?$path.'/':'';
+		$this->Path = '';
+		if($path){
+			$tmp = '';
+			foreach(explode('/',$path) as $val){
+				if($val != ''){
+					if($tmp != ''){
+						$tmp .= '/';
+					}
+					$tmp .= $val;
+				}
+			}
+			$this->Path = $tmp . '/';
+		}
 	}
 	public function ReSize(){
 		$width = $this->ImgInfo[0];
