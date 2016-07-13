@@ -1,6 +1,7 @@
 <?php
 /*
 $ImgFn = new Base64ImgReSize;
+//this file type is jpg or png
 
 $ImgFn->Load($Img,400,300,'test','images');
 //$Img is Base64 Image or File
@@ -18,7 +19,7 @@ $ImgFn->Save();
 //return file path(EX:path/filename)
 
 echo $ImgFn->GetImg();
-
+//return base64 Image
 */
 
 class Base64ImgReSize{
@@ -122,7 +123,7 @@ class Base64ImgReSize{
 		}
 		$this->Img = ob_get_contents ();
 		ob_end_clean ();
-		$this->Img = $tmp.base64_encode ($this->Img);
-		return $this->Img;
+		$ret = $tmp.base64_encode ($this->Img);
+		return $ret;
 	}
 }
